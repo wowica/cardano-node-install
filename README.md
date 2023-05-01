@@ -8,7 +8,7 @@ The scripts are based on the Official Documentation available on the [Cardano De
 
 Clone this repo or run the script below to download the script files to your local file system.
 
-`curl -s https://raw.githubusercontent.com/wowica/cardano-node-install/main/setup.sh | bash -`
+`curl -s https://raw.githubusercontent.com/wowica/cardano-node-install/main/scripts/setup.sh | bash -`
 
 Running the command above will strictly download the scripts. It will NOT execute them. You are required to do this yourself.
 

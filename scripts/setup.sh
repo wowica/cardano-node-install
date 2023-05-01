@@ -14,6 +14,6 @@ files=(
 
 for file in "${files[@]}"; do
   filename=$(basename "$file")
-  curl -s "https://raw.githubusercontent.com/wowica/cardano-node-install/main/$file" -o "$file"
+  curl -s "https://raw.githubusercontent.com/wowica/cardano-node-install/main/scripts/$file" -o "$file"
   chmod +x "$file"
 done
