@@ -1,5 +1,5 @@
 cat << 'EOF' > 01-install_dependencies.sh
-#/bin/bash
+#!/bin/bash
 
 sudo apt-get update -y && sudo apt-get upgrade -y
 sudo apt-get install automake build-essential pkg-config libffi-dev \
@@ -44,51 +44,20 @@ git checkout 66f017f1
 make
 sudo make install
 
-if [ -n "$BASH_VERSION" ]; then
-  echo 'export LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"' >> ~/.bashrc
-  echo 'export PKG_CONFIG_PATH="/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH"' >> ~/.bashrc
-  echo "Please source ~/.bashrc"
-
-elif [ -n "$ZSH_VERSION" ]; then
-  echo 'export LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"' >> ~/.zshrc
-  echo 'export PKG_CONFIG_PATH="/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH"' >> ~/.zshrc
-  echo "Please source ~/.zshrc"
-
-else
-  cat <<EOM 
-Unable to detect your shell. 
-Please add the following two lines to the bottom of your shell profile/config file 
-so that the compiler can be aware that libsodium is installed on your system.
-
-export LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"
-export PKG_CONFIG_PATH="/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH"
-EOM
-
-fi
-
 echo ""
 echo "Finished installing libsodium"
 echo ""
+echo 'export LD_LIBRARY_PATH="/usr/local/lib:$LD_LIBRARY_PATH"' >> ~/.bashrc
+echo 'export PKG_CONFIG_PATH="/usr/local/lib/pkgconfig:$PKG_CONFIG_PATH"' >> ~/.bashrc
+echo ""
+echo "Please source ~/.bashrc"
+echo ""
+fi
 EOF
 
 chmod +x 03-install_libsodium.sh
 
-cat << 'EOF' > 04-clone_cardano_node.sh
-#!/bin/bash
-
-git clone https://github.com/input-output-hk/cardano-node.git
-cd cardano-node
-git fetch --all --recurse-submodules --tags
-git checkout $(curl -s https://api.github.com/repos/input-output-hk/cardano-node/releases/latest | jq -r .tag_name)
-
-echo ""
-echo "Finished cloning cardano-node"
-echo ""
-EOF
-
-chmod +x 04-clone_cardano_node.sh
-
-cat << 'EOF' > 05-install_haskell.sh
+cat << 'EOF' > 04-install_haskell.sh
 #!/bin/bash
 
 BOOTSTRAP_HASKELL_NONINTERACTIVE=1 \
@@ -103,10 +72,31 @@ echo "Finished installing Haskell"
 echo ""
 EOF
 
-chmod +x 05-install_haskell.sh
+chmod +x 04-install_haskell.sh
+
+cat << 'EOF' > 05-clone_cardano_node.sh
+#!/bin/bash
+
+git clone https://github.com/input-output-hk/cardano-node.git
+cd cardano-node
+git fetch --all --recurse-submodules --tags
+git checkout $(curl -s https://api.github.com/repos/input-output-hk/cardano-node/releases/latest | jq -r .tag_name)
+
+echo ""
+echo "Finished cloning cardano-node"
+echo ""
+EOF
+
+chmod +x 05-clone_cardano_node.sh
 
 cat << 'EOF' > 06-compile_cardano_node.sh
-#/bin/bash
+#!/bin/bash
+
+echo ""
+echo "Starting the compilation process."
+echo "This takes around 30 mins on the recommended Cardano Node configuration"
+echo ""
+
 cd cardano-node
 cabal update
 cabal configure --with-compiler=ghc-8.10.7
@@ -115,12 +105,21 @@ time cabal build cardano-cli cardano-node
 echo ""
 echo "Finished compiling cardano node and cardano cli"
 echo ""
+
+mkdir -p $HOME/.cabal/bin
+cp -p "$(./scripts/bin-path.sh cardano-node)" $HOME/.cabal/bin/
+cp -p "$(./scripts/bin-path.sh cardano-cli)" $HOME/.cabal/bin/
+
+echo "Run the following commands in order to check the installation:"
+echo "cardano-cli --version"
+echo "cardano-node --version"
+echo ""
 EOF
 
 chmod +x 06-compile_cardano_node.sh
 
 cat << 'EOF' > 07-setup_config.sh
-#/bin/bash
+#!/bin/bash
 
 mkdir config db
 
@@ -148,8 +147,6 @@ EOF
 chmod +x 07-setup_config.sh
 
 cat << 'EOF' > 08-run_node.sh
-#/bin/bash
-
 #!/bin/bash
 
 cardano-node run \
@@ -162,3 +159,11 @@ cardano-node run \
 EOF
 
 chmod +x 08-run_node.sh
+
+cat << 'EOF' > 09-query_tip.sh
+#!/bin/bash
+
+CARDANO_NODE_SOCKET_PATH=/home/ubuntu/db/node.socket cardano-cli query tip --testnet-magic 2
+EOF
+
+chmod +x 09-query_tip.sh
