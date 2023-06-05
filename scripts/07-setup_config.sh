@@ -12,8 +12,8 @@ cat << 'DONE' > config/topology.json
 {
   "Producers": [
     {
-      "addr": "relay01.preview.junglestakepool.com",
-      "port": 3001,
+      "addr": "preview-node.world.dev.cardano.org",
+      "port": 30002,
       "valency": 1
     }
   ]
