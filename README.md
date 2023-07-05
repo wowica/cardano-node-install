@@ -1,6 +1,6 @@
 # Cardano Node Install
 
-This project aims to provide helper scripts for installing and running a Cardano Relay Node on a Linux machine for the **Preview Testnet** Environment. It has been tested on an **Ubuntu Server 22.04** with Cardano Node version **8.0.0** with PSP disabled.
+This project aims to provide helper scripts for installing and running a Cardano Relay Node on a Linux machine for the **Preview Testnet** Environment. It has been tested on an **Ubuntu Server 22.04** with Cardano Node version **8.1.1** with PSP disabled.
 
 The scripts are based on the Official Documentation available on the [Cardano Developers Portal](https://developers.cardano.org/docs/get-started/installing-cardano-node)
 
